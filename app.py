@@ -60,10 +60,10 @@ def profile():
 @app.route('/favorite')
 def favorite():
     return jsonify({
-        "favorite_color": "Green",
+        "favorite_color": "Pink",
         "favorite_subject": "Math",
         "favorite_artist": "Daniel Caesar",
-        "favorite_car": "Ferrari"
+        "favorite_car": "Jeep Wrangler"
     })
 
 @app.route('/study')
