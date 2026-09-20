@@ -57,5 +57,24 @@ def profile():
         ]
     })
 
+@app.route('/favorite')
+def favorite():
+    return jsonify({
+        "favorite_color": "Green",
+        "favorite_subject": "Math",
+        "favorite_artist": "Daniel Caesar",
+        "favorite_car": "Ferrari"
+    })
+
+@app.route('/study')
+def study():
+    subject = request.args.get('subject', 'Programming')
+    return jsonify({
+        "subject": subject,
+        "study_time": "2 hours",
+        "activity": "Practice coding",
+        "status": "Ready to study"
+    })
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
