@@ -4,8 +4,8 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "Welcome to my first API!"
-
+    return "Welcome to Jessica Ann's API!"
+    
 @app.route('/student')
 def get_student():
     return jsonify({
