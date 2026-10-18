@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -114,7 +115,8 @@
 
         #result,
         #greeting,
-        #profileResult {
+        #profileResult,
+        #studentList {
             margin-top: 20px;
         }
 
@@ -124,6 +126,7 @@
             gap: 15px;
             padding: 13px 0;
             border-bottom: 1px solid #e2e8f0;
+            overflow-wrap: anywhere;
         }
 
         .data-row:last-child {
@@ -137,7 +140,6 @@
 
         .data-value {
             color: #123047;
-            text-align: right;
             overflow-wrap: anywhere;
         }
 
@@ -205,10 +207,6 @@
                 flex-direction: column;
                 gap: 5px;
             }
-
-            .data-value {
-                text-align: left;
-            }
         }
     </style>
 </head>
@@ -226,7 +224,7 @@
             </p>
         </header>
 
-        <!-- STUDENT INFORMATION -->
+        
         <section class="card">
             <h2>Student Information</h2>
             <p class="description">
@@ -241,7 +239,7 @@
             <div id="result" aria-live="polite"></div>
         </section>
 
-        <!-- GREETING API -->
+
         <section class="card">
             <h2>Greeting API</h2>
             <p class="description">
@@ -269,7 +267,7 @@
             <div id="greeting" aria-live="polite"></div>
         </section>
 
-        <!-- CUSTOM PROFILE API -->
+
         <section class="card">
             <h2>My Student Profile</h2>
             <p class="description">
@@ -284,16 +282,31 @@
             <div id="profileResult" aria-live="polite"></div>
         </section>
 
+        
+        <section class="card">
+            <h2>Students from Database</h2>
+            <p class="description">
+                Click the button to retrieve all student records
+                stored in the SQLite database.
+            </p>
+
+            <button id="studentsButton" onclick="loadStudents()">
+                Load Students
+            </button>
+
+            <div id="studentList" aria-live="polite"></div>
+        </section>
+
         <footer>
-            <strong>Laboratory Activity 6</strong><br>
-            Building a Simple Web Interface for a Flask API<br>
+            <strong>Laboratory Activity 7</strong><br>
+            Integrating SQLite Database with Flask API<br>
             BSIT · System Integration
         </footer>
 
     </main>
 
     <script>
-        // Create a row without inserting API data as HTML.
+       
         function addRow(container, label, value) {
             const row = document.createElement("div");
             row.className = "data-row";
@@ -311,7 +324,7 @@
             container.appendChild(row);
         }
 
-        // STUDENT INFORMATION API
+      
         async function loadStudent() {
             const result = document.getElementById("result");
             const button = document.getElementById("studentButton");
@@ -352,7 +365,7 @@
             }
         }
 
-        // GREETING API
+        
         document.getElementById("greetingForm")
             .addEventListener("submit", async function(event) {
                 event.preventDefault();
@@ -397,7 +410,7 @@
                 }
             });
 
-        // CUSTOM PROFILE API
+       
         async function loadProfile() {
             const result = document.getElementById("profileResult");
             const button = document.getElementById("profileButton");
@@ -452,6 +465,62 @@
 
                 result.appendChild(message);
                 console.error("Profile API error:", error);
+
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        async function loadStudents() {
+            const studentList = document.getElementById("studentList");
+            const button = document.getElementById("studentsButton");
+
+            studentList.replaceChildren();
+            studentList.textContent = "Loading student records...";
+            button.disabled = true;
+
+            try {
+                const response = await fetch("/students");
+
+                if (!response.ok) {
+                    throw new Error("HTTP " + response.status);
+                }
+
+                const data = await response.json();
+                studentList.replaceChildren();
+
+                if (data.length === 0) {
+                    studentList.textContent = "No student records found.";
+                    return;
+                }
+
+                data.forEach(function(student) {
+                    const paragraph = document.createElement("p");
+                    paragraph.className = "data-row";
+
+                    const details = document.createElement("span");
+                    details.className = "data-value";
+                    details.textContent =
+                        student.student_id + " - " +
+                        student.name + " | " +
+                        student.program + " | Year " +
+                        student.year + " | Section " +
+                        student.section;
+
+                    paragraph.appendChild(details);
+                    studentList.appendChild(paragraph);
+                });
+
+            } catch (error) {
+                studentList.replaceChildren();
+
+                const message = document.createElement("p");
+                message.className = "error";
+                message.textContent =
+                    "Unable to retrieve student records.";
+
+                studentList.appendChild(message);
+                console.error("Database API error:", error);
 
             } finally {
                 button.disabled = false;
